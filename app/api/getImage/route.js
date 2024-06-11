@@ -1,9 +1,17 @@
 import { NextResponse, NextRequest } from "next/server";
 import path from "path";
 import { promises as fs } from "fs";
-import { jsonFilePath } from "../savejson/route";
+
+
 
 export const POST = async (req, res) => {
+  const jsonFilePath = path.join(
+    process.cwd(),
+    "app",
+    "api",
+    "savejson",
+    "data.json"
+  );
   const formData = await req.formData();
 
   const file = formData.get("file");

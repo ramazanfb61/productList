@@ -4,7 +4,7 @@ import path from "path";
 
 // JSON dosyasının yolu
 
-export const jsonFilePath = path.join(
+const jsonFilePath = path.join(
   process.cwd(),
   "app",
   "api",
@@ -16,11 +16,10 @@ export const GET = async (req, res) => {
   try {
     // JSON dosyasını oku
     const jsonData = await fs.readFile(jsonFilePath, "utf-8");
-    if(JSON.parse(jsonData).length > 0){
-
+    if (JSON.parse(jsonData).length > 0) {
       return NextResponse.json(JSON.parse(jsonData));
     }
-    return NextResponse.json({msg:'No Data'})
+    return NextResponse.json({ msg: "No Data" });
     // JSON verisini yanıt olarak gönder
   } catch (error) {
     // Hata durumunda uygun yanıtı gönder
@@ -31,7 +30,6 @@ export const GET = async (req, res) => {
 
 export const POST = async (req, res) => {
   try {
-    
     const body = await req.json();
     const { stkkod, ...newData } = body;
 
@@ -40,15 +38,14 @@ export const POST = async (req, res) => {
     const data = JSON.parse(jsonData);
 
     // JSON dosyasındaki veriyi güncelle
-    const updatedData = data.map(item => 
+    const updatedData = data.map((item) =>
       item.stkkod === stkkod ? { ...item, ...newData } : item
     );
 
     // Eğer eşleşen stkkod yoksa yeni öğeyi ekle
-    if (!updatedData.find(item => item.stkkod === stkkod)) {
+    if (!updatedData.find((item) => item.stkkod === stkkod)) {
       updatedData.push(body);
     }
-  
 
     // Güncellenmiş veriyi JSON dosyasına yaz
     await fs.writeFile(jsonFilePath, JSON.stringify(updatedData, null, 2));

@@ -31,7 +31,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange, totalItem }) => {
   return (
     <div className="md:mr-16 py-2 flex flex-col md:flex-row items-center mx-auto md:mx-0">
       <div className="md:mr-3">Kitap sayısı: {totalItem}</div>
-      <div className="flex">
+      <div className="flex gap-x-2">
         <button
           className={`p-1.5 border hover:bg-gray-400 transition-all cursor-pointer `}
           onClick={handlePreviousTwice}

@@ -1,10 +1,30 @@
 [
   {
-    "path": "/public/uploads/1050-indir_(1).jpeg",
+    "path": "/uploads/1050-elma.jpeg",
     "stkkod": "1050"
   },
   {
-    "path": "/public/uploads/1051-indir_(1).jpeg",
+    "path": "/uploads/1051-indir_(1).jpeg",
     "stkkod": "1051"
+  },
+  {
+    "path": "/uploads/1052-indir.jpeg",
+    "stkkod": "1052"
+  },
+  {
+    "path": "/uploads/1053-indir_(1).jpeg",
+    "stkkod": "1053"
+  },
+  {
+    "path": "/uploads/1AS-indir_(1).jpeg",
+    "stkkod": "1AS"
+  },
+  {
+    "path": "/uploads/1ASE-Untitled4_20230416032354.png",
+    "stkkod": "1ASE"
+  },
+  {
+    "path": "/uploads/8O6-17181074239606722636253288674197.jpg",
+    "stkkod": "8O6"
   }
 ]

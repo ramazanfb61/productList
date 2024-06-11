@@ -2,7 +2,10 @@
 import { useState, useEffect } from "react";
 import { BsCheckCircleFill, BsFillXCircleFill } from "react-icons/bs";
 import { BiImageAdd } from "react-icons/bi";
+
+// filter yapılmadı
 import FilterButton from "./FilterButton";
+
 import Pagination from "./Pagination";
 import Image from "next/image";
 
@@ -14,9 +17,11 @@ export default function DataList() {
   const [products, setProducts] = useState([]);
   // şimdiki sayfa
   const [currentPage, setCurrentPage] = useState(1);
-  const [uploadedFiles, setUploadedFiles] = useState({});
   const [filter, setFilter] = useState(false);
-  const [jsonImages, setJsonImages] = useState([]);
+  const [jsonImages, setJsonImages] = useState([
+    { msg: "bos data" },
+    { msg: "bos data" },
+  ]);
   // toplam sayfa
   const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE);
 
@@ -44,6 +49,20 @@ export default function DataList() {
     return 0;
   });
 
+  const displayImage = ({ stkkod }) => {
+    const image =
+      jsonImages && jsonImages.includes(stkkod)
+        ? jsonImages.indexOf(stkkod)
+        : "yok";
+    console.log(jsonImages.indexOf(stkkod));
+    return (
+      <div>
+        <img src={image} />
+        {image}
+      </div>
+    );
+  };
+
   const jsonData = async () => {
     try {
       const response = await fetch(`/api/savejson`, { methods: "GET" });
@@ -52,6 +71,10 @@ export default function DataList() {
       }
       const data = await response.json();
       console.log(data);
+      if (data.length < 1) {
+        setJsonImages([{ msg: "Bos data" },{msg:'bos data'}]);
+        return;
+      }
       setJsonImages(data);
     } catch (error) {
       console.error("Veri çekme hatası: ", error);
@@ -112,12 +135,12 @@ export default function DataList() {
                   <input type="checkbox" name="" id="" className="h-5 w-5" />
                 </th>
                 <th className="p-3 w-10 text-sm font-semibold tracking-wide text-left">
-                  Image
+                  Resim
                 </th>
                 <th className="p-3 w-72 text-sm font-semibold tracking-wide text-left">
                   <span className="flex items-center">
                     <span className="mr-1">İsim</span>
-                    <FilterButton />
+                    
                   </span>
                 </th>
                 <th className="p-3 w-10 text-sm font-semibold tracking-wide text-left">
@@ -126,13 +149,13 @@ export default function DataList() {
                 <th className="p-3 w-10 text-sm font-semibold tracking-wide text-left">
                   <span className=" w-24 flex items-center">
                     <span className="mr-1">Stok Sayısı</span>
-                    <FilterButton />
+                    
                   </span>
                 </th>
                 <th className="p-3 w-10 text-sm font-semibold tracking-wide text-left">
                   <span className=" w-12 flex items-center">
                     <span className="mr-1">Fiyat</span>
-                    <FilterButton />
+                    
                   </span>
                 </th>
                 <th className="p-3 w-10 text-sm font-semibold tracking-wide text-left">
@@ -145,83 +168,107 @@ export default function DataList() {
                   Ürün Durumu
                 </th>
                 <th className="p-3 w-10 text-sm font-semibold tracking-wide text-center">
-                  Image Ekle/Düzenle
+                  Resim ekle
                 </th>
               </tr>
             </thead>
             <tbody className="text-left divide-y min-w-96 divide-gray-100">
-              {paginatedProducts.map((product) => (
-                <tr key={product.STKKOD} className="even:bg-gray-50">
-                  <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                    <input type="checkbox" name="" id="" className="h-5 w-5" />
-                  </td>
-                  <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                    {jsonImages.map(e => e.stkkod === product.STKKOD ? 'var' : 'yok')}
-                  </td>
-                  <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                    {product.STKCINSI}
-                  </td>
-                  <td className="p-3 text-sm font-bold cursor-pointer text-blue-500 hover:underline whitespace-nowrap">
-                    {product.STKKOD}
-                  </td>
-                  <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                    {product.STOK}
-                  </td>
-                  <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                    {product.FIYAT}
-                  </td>
-                  <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                    {product.CARCATEGORY}
-                  </td>
-                  <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                    {product.CARGRADE}
-                  </td>
-                  <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                    <span
-                      className={`p-1.5 text-xs font-medium uppercase flex justify-evenly tracking-wider rounded-lg ${
-                        product.STKOZKOD1 === "A"
-                          ? "text-green-800 bg-green-200 pr-11"
-                          : "text-red-800 bg-red-200"
-                      }`}
-                    >
-                      {product.STKOZKOD1 === "A" ? (
-                        <BsCheckCircleFill className="inline mr-2 self-center" />
-                      ) : (
-                        <BsFillXCircleFill className="inline mr-2 self-center" />
-                      )}
-                      {product.STKOZKOD1 === "A"
-                        ? "Satışa uygun"
-                        : "Satışa uygun değil"}
-                    </span>
-                  </td>
-                  <td className="whitespace-nowrap text-center">
-                    <div className="flex flex-col pt-1 justify-center items-center">
-                      <label
-                        className="transition-all cursor-pointer p-2 rounded-full hover:bg-gray-300"
-                        htmlFor={`file-${product.STKKOD}`}
-                      >
-                        <BiImageAdd className="w-7 h-7" />
-                      </label>
-                      <form>
-                        <input
-                          multiple
-                          onChange={(event) =>
-                            handleFiles(event, product.STKKOD)
-                          }
-                          type="file"
-                          id={`file-${product.STKKOD}`}
-                          className="hidden"
-                          name="file"
+              {paginatedProducts.map((product) => {
+                const image = jsonImages && jsonImages.length > 0 ?
+                jsonImages.find(
+                  (e) => e.stkkod === product.STKKOD
+                )
+                :
+                {stkkod:'no data',path:'/no/data'}
+
+                return (
+                  <tr key={product.STKKOD} className="even:bg-gray-50">
+                    <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                      <input
+                        type="checkbox"
+                        name=""
+                        id=""
+                        className="h-5 w-5"
+                      />
+                    </td>
+                    <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                      {jsonImages && image ? (
+                        <Image
+                          src={image.path}
+                          width={50}
+                          height={50}
+                          alt={image.stkkod}
+                          srcset=""
                         />
-                      </form>
-                      <label
-                        className=" w-24 text-xs  overflow-hidden text-ellipsis"
-                        htmlFor={`file-${product.STKKOD}`}
-                      ></label>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                      ) : (
+                        ""
+                      )}
+                    </td>
+                    <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                      {product.STKCINSI}
+                    </td>
+                    <td className="p-3 text-sm font-bold cursor-pointer text-blue-500 hover:underline whitespace-nowrap">
+                      {product.STKKOD}
+                    </td>
+                    <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                      {product.STOK}
+                    </td>
+                    <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                      {product.FIYAT}
+                    </td>
+                    <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                      {product.CARCATEGORY}
+                    </td>
+                    <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                      {product.CARGRADE}
+                    </td>
+                    <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                      <span
+                        className={`p-1.5 text-xs font-medium uppercase flex justify-evenly tracking-wider rounded-lg ${
+                          product.STKOZKOD1 === "A"
+                            ? "text-green-800 bg-green-200 pr-11"
+                            : "text-red-800 bg-red-200"
+                        }`}
+                      >
+                        {product.STKOZKOD1 === "A" ? (
+                          <BsCheckCircleFill className="inline mr-2 self-center" />
+                        ) : (
+                          <BsFillXCircleFill className="inline mr-2 self-center" />
+                        )}
+                        {product.STKOZKOD1 === "A"
+                          ? "Satışa uygun"
+                          : "Satışa uygun değil"}
+                      </span>
+                    </td>
+                    <td className="whitespace-nowrap text-center">
+                      <div className="flex flex-col pt-1 justify-center items-center">
+                        <label
+                          className="transition-all cursor-pointer p-2 rounded-full hover:bg-gray-300"
+                          htmlFor={`file-${product.STKKOD}`}
+                        >
+                          <BiImageAdd className="w-7 h-7" />
+                        </label>
+                        <form>
+                          <input
+                            multiple
+                            onChange={(event) =>
+                              handleFiles(event, product.STKKOD)
+                            }
+                            type="file"
+                            id={`file-${product.STKKOD}`}
+                            className="hidden"
+                            name="file"
+                          />
+                        </form>
+                        <label
+                          className=" w-24 text-xs  overflow-hidden text-ellipsis"
+                          htmlFor={`file-${product.STKKOD}`}
+                        ></label>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

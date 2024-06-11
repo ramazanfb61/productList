@@ -4,7 +4,7 @@ import path from "path";
 
 // JSON dosyasının yolu
 
-const jsonFilePath = path.join(
+export const jsonFilePath = path.join(
   process.cwd(),
   "app",
   "api",
@@ -16,9 +16,12 @@ export const GET = async (req, res) => {
   try {
     // JSON dosyasını oku
     const jsonData = await fs.readFile(jsonFilePath, "utf-8");
+    if(JSON.parse(jsonData).length > 0){
 
+      return NextResponse.json(JSON.parse(jsonData));
+    }
+    return NextResponse.json({msg:'No Data'})
     // JSON verisini yanıt olarak gönder
-    return NextResponse.json(JSON.parse(jsonData));
   } catch (error) {
     // Hata durumunda uygun yanıtı gönder
     console.error("Error reading JSON file:", error);
@@ -45,6 +48,7 @@ export const POST = async (req, res) => {
     if (!updatedData.find(item => item.stkkod === stkkod)) {
       updatedData.push(body);
     }
+  
 
     // Güncellenmiş veriyi JSON dosyasına yaz
     await fs.writeFile(jsonFilePath, JSON.stringify(updatedData, null, 2));

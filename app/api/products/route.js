@@ -1,4 +1,4 @@
-import { getAllData } from "@/services/serviceOperations";
+import { getAllData } from "../../../services/serviceOperations/index";
 import { NextRequest, NextResponse } from "next/server";
 
 

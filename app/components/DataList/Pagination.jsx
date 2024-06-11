@@ -29,7 +29,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange, totalItem }) => {
   };
 
   return (
-    <div className="md:mr-16 py-2 flex flex-col md:flex-row items-center mx-auto md:mx-0">
+    <div className="md:mr-16 pb-1 flex flex-col md:flex-row items-center mx-auto md:mx-0">
       <div className="md:mr-3">Kitap sayısı: {totalItem}</div>
       <div className="flex gap-x-2">
         <button
@@ -48,8 +48,10 @@ const Pagination = ({ currentPage, totalPages, onPageChange, totalItem }) => {
         </button>
 
         <span className="flex justify-between items-center">
-          <div className="rounded-full bg-blue-900 p-1 px-3 text-white">
-            {currentPage}
+          <div className={`box-content rounded-full  bg-blue-900 p-1  text-white ${currentPage < 10 ? 'px-3' :'px-2' }`}>
+            <div className="">
+              {currentPage}
+            </div>
           </div>
           <span>/</span>
           <span className="">{totalPages}</span>

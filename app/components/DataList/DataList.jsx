@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { BsCheckCircleFill, BsFillXCircleFill } from "react-icons/bs";
 import { BiImageAdd } from "react-icons/bi";
+import { BsTrash3 } from "react-icons/bs";
 
 // filter yapılmadı
 import FilterButton from "./FilterButton";
@@ -18,10 +19,7 @@ export default function DataList() {
   // şimdiki sayfa
   const [currentPage, setCurrentPage] = useState(1);
   const [filter, setFilter] = useState(false);
-  const [jsonImages, setJsonImages] = useState([
-    { msg: "bos data" },
-    { msg: "bos data" },
-  ]);
+  const [jsonImages, setJsonImages] = useState([{ msg: "" }, { msg: "" }]);
   // toplam sayfa
   const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE);
 
@@ -49,20 +47,6 @@ export default function DataList() {
     return 0;
   });
 
-  const displayImage = ({ stkkod }) => {
-    const image =
-      jsonImages && jsonImages.includes(stkkod)
-        ? jsonImages.indexOf(stkkod)
-        : "yok";
-    console.log(jsonImages.indexOf(stkkod));
-    return (
-      <div>
-        <img src={image} />
-        {image}
-      </div>
-    );
-  };
-
   const jsonData = async () => {
     try {
       const response = await fetch(`/api/savejson`, { methods: "GET" });
@@ -72,7 +56,7 @@ export default function DataList() {
       const data = await response.json();
       console.log(data);
       if (data.length < 1) {
-        setJsonImages([{ msg: "Bos data" },{msg:'bos data'}]);
+        setJsonImages([{ msg: "Bos data" }, { msg: "bos data" }]);
         return;
       }
       setJsonImages(data);
@@ -98,12 +82,26 @@ export default function DataList() {
     const formData = new FormData();
     formData.append("file", e.target.files[0]);
     formData.append("key", key);
+    // 'post' olursa image yükle 'delete' olursa sil
 
     const data = await fetch(`/api/getImage`, {
       method: "POST",
       body: formData,
     });
     jsonData();
+  }
+
+  async function deleteImage(path, stkkod) {
+    console.log('delete',stkkod,path);
+    const formData = new FormData();
+    formData.append("path", path);
+    formData.append("stkkod", stkkod);
+
+    const data = await fetch(`/api/getImage`, {
+      method: "DELETE",
+      body: formData,
+    });
+    jsonData()
   }
 
   useEffect(() => {
@@ -115,10 +113,10 @@ export default function DataList() {
 
   return (
     <div className=" h-3/5 mt-3">
-      <section className="mb-3">
+      <section className="mb-2">
         <h3 className="text-3xl text-center">Ürünler</h3>
         <div>
-          <div className="border flex justify-end">
+          <div className="flex justify-end">
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
@@ -127,62 +125,57 @@ export default function DataList() {
             />
           </div>
         </div>
-        <div className="overflow-auto md:rounded-lg shadow">
-          <table className="md:mx-auto border w-full md:w-11/12">
+        <div className="overflow-auto">
+          <table className="md:mx-auto border w-full md:rounded-lg shadow">
             <thead className="bg-blue-900 text-white border-b-2 border-gray-200">
-              <tr>
-                <th className="p-3 w-10 text-sm font-semibold tracking-wide text-left">
+              <tr className="w-full border ">
+                <th className="p-3 text-sm font-semibold tracking-wide text-left">
                   <input type="checkbox" name="" id="" className="h-5 w-5" />
                 </th>
-                <th className="p-3 w-10 text-sm font-semibold tracking-wide text-left">
+                <th className="p-3  text-sm font-semibold tracking-wide text-left">
                   Resim
                 </th>
-                <th className="p-3 w-72 text-sm font-semibold tracking-wide text-left">
+                <th className="p-3 col-span-3  text-sm font-semibold tracking-wide text-left">
                   <span className="flex items-center">
                     <span className="mr-1">İsim</span>
-                    
                   </span>
                 </th>
-                <th className="p-3 w-10 text-sm font-semibold tracking-wide text-left">
+                <th className="p-3  text-sm font-semibold tracking-wide text-left">
                   Stok Kodu
                 </th>
-                <th className="p-3 w-10 text-sm font-semibold tracking-wide text-left">
+                <th className="p-3  text-sm font-semibold tracking-wide text-left">
                   <span className=" w-24 flex items-center">
                     <span className="mr-1">Stok Sayısı</span>
-                    
                   </span>
                 </th>
-                <th className="p-3 w-10 text-sm font-semibold tracking-wide text-left">
+                <th className="p-3  text-sm font-semibold tracking-wide text-left">
                   <span className=" w-12 flex items-center">
                     <span className="mr-1">Fiyat</span>
-                    
                   </span>
                 </th>
-                <th className="p-3 w-10 text-sm font-semibold tracking-wide text-left">
+                <th className="p-3  text-sm font-semibold tracking-wide text-left ">
                   Ders
                 </th>
-                <th className="p-3 w-10 text-sm font-semibold tracking-wide text-left">
+                <th className="p-3  text-sm font-semibold tracking-wide text-left">
                   Sınıf
                 </th>
-                <th className="p-3 w-16 text-sm font-semibold tracking-wide text-left">
+                <th className="p-3  text-sm font-semibold tracking-wide text-center">
                   Ürün Durumu
                 </th>
-                <th className="p-3 w-10 text-sm font-semibold tracking-wide text-center">
+                <th className="p-3  text-sm font-semibold tracking-wide text-center">
                   Resim ekle
                 </th>
               </tr>
             </thead>
             <tbody className="text-left divide-y min-w-96 divide-gray-100">
               {paginatedProducts.map((product) => {
-                const image = jsonImages && jsonImages.length > 0 ?
-                jsonImages.find(
-                  (e) => e.stkkod === product.STKKOD
-                )
-                :
-                {stkkod:'no data',path:'/no/data'}
+                const image =
+                  jsonImages && jsonImages.length > 0
+                    ? jsonImages.find((e) => e.stkkod === product.STKKOD)
+                    : { stkkod: "", path: "" };
 
                 return (
-                  <tr key={product.STKKOD} className="even:bg-gray-50">
+                  <tr key={product.STKKOD} className="even:bg-gray-50 ">
                     <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
                       <input
                         type="checkbox"
@@ -191,15 +184,26 @@ export default function DataList() {
                         className="h-5 w-5"
                       />
                     </td>
-                    <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                      {jsonImages && image ? (
-                        <Image
-                          src={image.path}
-                          width={50}
-                          height={50}
-                          alt={image.stkkod}
-                          srcset=""
-                        />
+                    <td className="flex p-3 text-sm text-gray-700 whitespace-nowrap box-content">
+                      {jsonImages && image && image.path.length >0 ? (
+                        <>
+                          <Image
+                            src={image.path}
+                            width={45}
+                            height={45}
+                            alt={image.stkkod}
+                          />
+                          <div className="flex cursor-pointer items-end px-2 py-1">
+                            <BsTrash3
+                              onClick={() =>
+                                deleteImage(image.path, image.stkkod)
+                              }
+                              className={`${
+                                jsonImages && image ? "block" : "hidden"
+                              } w-4 h-4 text-red-700`}
+                            />
+                          </div>
+                        </>
                       ) : (
                         ""
                       )}

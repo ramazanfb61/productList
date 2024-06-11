@@ -27,14 +27,14 @@ export default function DataList() {
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
-  const AnimatedSpin = ({props}) => {
+  const AnimatedSpin = () => {
     return (
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="1em"
         height="1em"
         viewBox="0 0 24 24"
-        className={props}
+        className={`fixed z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 tra h-36 w-auto`}
       >
         <path
           fill="currentColor"
@@ -62,20 +62,6 @@ export default function DataList() {
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
-  const sortedProducts = paginatedProducts.slice().sort((a, b) => {
-    // Örneğin, isimlere göre sıralama yapmak için STKCINSI alanını kullanıyoruz.
-    // Bu alana göre sıralama yapabilirsiniz.
-    const nameA = a.STKCINSI.toUpperCase(); // Büyük/küçük harfe duyarlı sıralama
-    const nameB = b.STKCINSI.toUpperCase();
-
-    if (nameA < nameB) {
-      return -1;
-    }
-    if (nameA > nameB) {
-      return 1;
-    }
-    return 0;
-  });
 
   const jsonData = async () => {
     try {
@@ -146,6 +132,13 @@ export default function DataList() {
 
   return (
     <div className=" h-3/5 mt-3">
+      {isLoading ? (
+        <div className="absolute top-0 w-full h-full left-0 bg-slate-800 bg-opacity-40">
+          <AnimatedSpin />
+        </div>
+      ) : (
+        ""
+      )}
       <section className="mb-2">
         <h3 className="text-3xl text-center">Ürünler</h3>
         <div>
@@ -220,7 +213,6 @@ export default function DataList() {
                     <td className="flex p-3 text-sm text-gray-700 whitespace-nowrap box-content">
                       {jsonImages && image && image.path.length > 0 && (
                         <>
-                          {isLoading ? <AnimatedSpin props={` h-11 w-11 absolute z-10 bg-opacity-30 bg-slate-500`} /> : ""}
                           <Image
                             src={image.path}
                             width={45}
@@ -282,11 +274,7 @@ export default function DataList() {
                           className="transition-all cursor-pointer p-2 rounded-full hover:bg-gray-300"
                           htmlFor={`file-${product.STKKOD}`}
                         >
-                          {isLoading && product.STKKOD ? (
-                            <AnimatedSpin props={` h-7 w-7 absolute z-10 bg-opacity-30 bg-slate-500`} />
-                          ) : (
-                            <BiImageAdd className="w-7 h-7" />
-                          )}
+                          <BiImageAdd className="w-7 h-7" />
                         </label>
                         <form>
                           <input

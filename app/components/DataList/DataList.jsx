@@ -18,6 +18,7 @@ export default function DataList() {
   const [products, setProducts] = useState([]);
   // şimdiki sayfa
   const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
   const [filter, setFilter] = useState(false);
   const [jsonImages, setJsonImages] = useState([{ msg: "" }, { msg: "" }]);
   // toplam sayfa
@@ -25,6 +26,35 @@ export default function DataList() {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
+  };
+  const AnimatedSpin = ({props}) => {
+    return (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="1em"
+        height="1em"
+        viewBox="0 0 24 24"
+        className={props}
+      >
+        <path
+          fill="currentColor"
+          d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z"
+          opacity="0.25"
+        />
+        <path
+          fill="currentColor"
+          d="M12,4a8,8,0,0,1,7.89,6.7A1.53,1.53,0,0,0,21.38,12h0a1.5,1.5,0,0,0,1.48-1.75,11,11,0,0,0-21.72,0A1.5,1.5,0,0,0,2.62,12h0a1.53,1.53,0,0,0,1.49-1.3A8,8,0,0,1,12,4Z"
+        >
+          <animateTransform
+            attributeName="transform"
+            dur="0.75s"
+            repeatCount="indefinite"
+            type="rotate"
+            values="0 12 12;360 12 12"
+          />
+        </path>
+      </svg>
+    );
   };
 
   // ürünleri sayfalara böl
@@ -49,6 +79,7 @@ export default function DataList() {
 
   const jsonData = async () => {
     try {
+      setIsLoading(true);
       const response = await fetch(`/api/savejson`, { methods: "GET" });
       if (!response.ok) {
         throw new Error("API hatası: " + response.status);
@@ -60,6 +91,8 @@ export default function DataList() {
         return;
       }
       setJsonImages(data);
+
+      setIsLoading(false);
     } catch (error) {
       console.error("Veri çekme hatası: ", error);
     }
@@ -92,7 +125,7 @@ export default function DataList() {
   }
 
   async function deleteImage(path, stkkod) {
-    console.log('delete',stkkod,path);
+    console.log("delete", stkkod, path);
     const formData = new FormData();
     formData.append("path", path);
     formData.append("stkkod", stkkod);
@@ -101,7 +134,7 @@ export default function DataList() {
       method: "DELETE",
       body: formData,
     });
-    jsonData()
+    jsonData();
   }
 
   useEffect(() => {
@@ -185,8 +218,9 @@ export default function DataList() {
                       />
                     </td>
                     <td className="flex p-3 text-sm text-gray-700 whitespace-nowrap box-content">
-                      {jsonImages && image && image.path.length >0 ? (
+                      {jsonImages && image && image.path.length > 0 && (
                         <>
+                          {isLoading ? <AnimatedSpin props={` h-11 w-11 absolute z-10 bg-opacity-30 bg-slate-500`} /> : ""}
                           <Image
                             src={image.path}
                             width={45}
@@ -204,8 +238,6 @@ export default function DataList() {
                             />
                           </div>
                         </>
-                      ) : (
-                        ""
                       )}
                     </td>
                     <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
@@ -250,7 +282,11 @@ export default function DataList() {
                           className="transition-all cursor-pointer p-2 rounded-full hover:bg-gray-300"
                           htmlFor={`file-${product.STKKOD}`}
                         >
-                          <BiImageAdd className="w-7 h-7" />
+                          {isLoading && product.STKKOD ? (
+                            <AnimatedSpin props={` h-7 w-7 absolute z-10 bg-opacity-30 bg-slate-500`} />
+                          ) : (
+                            <BiImageAdd className="w-7 h-7" />
+                          )}
                         </label>
                         <form>
                           <input

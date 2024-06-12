@@ -2,12 +2,12 @@ import { NextResponse, NextRequest } from "next/server";
 import path from "path";
 import { promises as fs } from "fs";
 
+const jsonFilePath = path.join(
+  process.cwd(),
+  'public',
+  "data.json"
+);
 export const POST = async (req, res) => {
-  const jsonFilePath = path.join(
-    process.cwd(),
-    
-    "data.json"
-  );
   const formData = await req.formData();
 
   const file = formData.get("file");
@@ -74,11 +74,6 @@ export const DELETE = async (req) => {
   if (!stkkod) {
     return NextResponse.json({ error: "stkkod is required." }, { status: 400 });
   }
-
-  const jsonFilePath = path.join(
-    process.cwd(),
-    "data.json"
-  );
 
   try {
     const jsonData = await fs.readFile(jsonFilePath, "utf-8");

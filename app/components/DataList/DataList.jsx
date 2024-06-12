@@ -103,7 +103,7 @@ export default function DataList() {
     formData.append("key", key);
     // 'post' olursa image yükle 'delete' olursa sil
 
-    const data = await fetch(`/api/getImage`, {
+    await fetch(`/api/getImage`, {
       method: "POST",
       body: formData,
     });

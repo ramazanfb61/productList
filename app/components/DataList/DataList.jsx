@@ -71,7 +71,6 @@ export default function DataList() {
         throw new Error("API hatası: " + response.status);
       }
       const data = await response.json();
-      console.log(data);
       if (data.length < 1) {
         setJsonImages([{ msg: "Bos data" }, { msg: "bos data" }]);
         return;
@@ -103,7 +102,7 @@ export default function DataList() {
     formData.append("key", key);
     // 'post' olursa image yükle 'delete' olursa sil
 
-    await fetch(`/api/getImage`, {
+    const data = await fetch(`/api/getImage`, {
       method: "POST",
       body: formData,
     });
@@ -219,14 +218,14 @@ export default function DataList() {
                             height={45}
                             alt={image.stkkod}
                           />
-                          <div className="flex cursor-pointer items-end px-2 py-1">
+                          <div className="flex  items-end px-2 py-1">
                             <BsTrash3
                               onClick={() =>
                                 deleteImage(image.path, image.stkkod)
                               }
                               className={`${
                                 jsonImages && image ? "block" : "hidden"
-                              } w-4 h-4 text-red-700`}
+                              } w-4 h-4 text-red-700 cursor-pointer`}
                             />
                           </div>
                         </>

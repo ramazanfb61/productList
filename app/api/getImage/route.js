@@ -2,22 +2,11 @@ import { NextResponse, NextRequest } from "next/server";
 import path from "path";
 import { promises as fs } from "fs";
 
-let jsonFilePath;
-
-if(process.env.NODE_ENV==='production'){
-  jsonFilePath = path.join(
-    process.cwd(),
-    'uploads',
-    "data.json"
-  )
-}else{
-  jsonFilePath = path.join(
-    process.cwd(),
-    'public',
-    "data.json"
-  )
-};
-
+const jsonFilePath = path.join(
+  process.cwd(),
+  'public',
+  "data.json"
+);
 export const POST = async (req, res) => {
   const formData = await req.formData();
 
@@ -31,17 +20,7 @@ export const POST = async (req, res) => {
 
   const buffer = Buffer.from(await file.arrayBuffer());
   const filename = key + "-" + file.name.replaceAll(" ", "_");
-  let uploadPath ;
-
-
-  if(process.env.NODE_ENV==='production'){
-    uploadPath = path.join(
-      process.cwd(),
-      '/uploads/' + filename
-    )
-  }else{
-    uploadPath = process.cwd() + "/public/uploads/" + filename
-  };
+  const uploadPath = process.cwd() + "/public/uploads/" + filename;
 
   console.log(filename);
 
@@ -95,6 +74,8 @@ export const DELETE = async (req) => {
   if (!stkkod) {
     return NextResponse.json({ error: "stkkod is required." }, { status: 400 });
   }
+
+  
 
   try {
     const jsonData = await fs.readFile(jsonFilePath, "utf-8");

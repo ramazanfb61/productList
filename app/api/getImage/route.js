@@ -2,19 +2,21 @@ import { NextResponse, NextRequest } from "next/server";
 import path from "path";
 import { promises as fs } from "fs";
 
-if(process.env.NODE_ENV==='development'){
-  const jsonFilePath = path.join(
+let jsonFilePath;
+
+if(process.env.NODE_ENV==='production'){
+  jsonFilePath = path.join(
     process.cwd(),
     "data.json"
   )
 }else{
-  const jsonFilePath = path.join(
+  jsonFilePath = path.join(
     process.cwd(),
     'public',
     "data.json"
   )
-}
-;
+};
+
 export const POST = async (req, res) => {
   const formData = await req.formData();
 
@@ -28,7 +30,17 @@ export const POST = async (req, res) => {
 
   const buffer = Buffer.from(await file.arrayBuffer());
   const filename = key + "-" + file.name.replaceAll(" ", "_");
-  const uploadPath = process.cwd() + "/public/uploads/" + filename;
+  let uploadPath ;
+
+
+  if(process.env.NODE_ENV==='production'){
+    uploadPath = path.join(
+      process.cwd(),
+      '/uploads/' + filename
+    )
+  }else{
+    uploadPath = process.cwd() + "/public/uploads/" + filename
+  };
 
   console.log(filename);
 

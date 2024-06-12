@@ -2,14 +2,17 @@ import fs from "fs/promises";
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
 
+
+
 // JSON dosyasının yolu
-if(process.env.NODE_ENV==='development'){
-  const jsonFilePath = path.join(
+let jsonFilePath;
+if(process.env.NODE_ENV==='production'){
+  jsonFilePath = path.join(
     process.cwd(),
     "data.json"
   )
 }else{
-  const jsonFilePath = path.join(
+  jsonFilePath = path.join(
     process.cwd(),
     'public',
     "data.json"

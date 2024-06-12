@@ -7,6 +7,7 @@ let jsonFilePath;
 if(process.env.NODE_ENV==='production'){
   jsonFilePath = path.join(
     process.cwd(),
+    'uploads',
     "data.json"
   )
 }else{

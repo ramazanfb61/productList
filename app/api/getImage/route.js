@@ -5,7 +5,6 @@ import { promises as fs } from "fs";
 export const POST = async (req, res) => {
   const jsonFilePath = path.join(
     process.cwd(),
-    "public",
     
     "data.json"
   );
@@ -78,7 +77,6 @@ export const DELETE = async (req) => {
 
   const jsonFilePath = path.join(
     process.cwd(),
-    "public",
     "data.json"
   );
 

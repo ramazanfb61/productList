@@ -6,7 +6,7 @@ import path from "path";
 
 const jsonFilePath = path.join(
   process.cwd(),
-  "public",
+  
   "data.json"
 );
 

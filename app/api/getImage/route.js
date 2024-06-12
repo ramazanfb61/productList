@@ -2,11 +2,19 @@ import { NextResponse, NextRequest } from "next/server";
 import path from "path";
 import { promises as fs } from "fs";
 
-const jsonFilePath = path.join(
-  process.cwd(),
-  'public',
-  "data.json"
-);
+if(process.env.NODE_ENV==='development'){
+  const jsonFilePath = path.join(
+    process.cwd(),
+    "data.json"
+  )
+}else{
+  const jsonFilePath = path.join(
+    process.cwd(),
+    'public',
+    "data.json"
+  )
+}
+;
 export const POST = async (req, res) => {
   const formData = await req.formData();
 

@@ -3,12 +3,19 @@ import { NextRequest, NextResponse } from "next/server";
 import path from "path";
 
 // JSON dosyasının yolu
-
-const jsonFilePath = path.join(
-  process.cwd(),
-  'public',
-  "data.json"
-);
+if(process.env.NODE_ENV==='development'){
+  const jsonFilePath = path.join(
+    process.cwd(),
+    "data.json"
+  )
+}else{
+  const jsonFilePath = path.join(
+    process.cwd(),
+    'public',
+    "data.json"
+  )
+}
+;
 
 export const GET = async (req, res) => {
   try {

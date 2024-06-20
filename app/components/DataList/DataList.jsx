@@ -58,10 +58,16 @@ export default function DataList() {
   };
 
   // ürünleri sayfalara böl
-  const paginatedProducts = products.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+  let paginatedProducts ;
+
+  if(products && products.length > 0){
+    paginatedProducts = products.slice(
+      (currentPage - 1) * ITEMS_PER_PAGE,
+      currentPage * ITEMS_PER_PAGE
+    );
+  }else{
+    paginatedProducts = [];
+  }
 
   const jsonData = async () => {
     try {
@@ -71,6 +77,7 @@ export default function DataList() {
         throw new Error("API hatası: " + response.status);
       }
       const data = await response.json();
+      console.log(data);
       if (data.length < 1) {
         setJsonImages([{ msg: "Bos data" }, { msg: "bos data" }]);
         return;
@@ -193,7 +200,7 @@ export default function DataList() {
               </tr>
             </thead>
             <tbody className="text-left divide-y min-w-96 divide-gray-100">
-              {paginatedProducts.map((product) => {
+              {paginatedProducts && paginatedProducts.map((product) => {
                 const image =
                   jsonImages && jsonImages.length > 0
                     ? jsonImages.find((e) => e.stkkod === product.STKKOD)
@@ -218,14 +225,14 @@ export default function DataList() {
                             height={45}
                             alt={image.stkkod}
                           />
-                          <div className="flex  items-end px-2 py-1">
+                          <div className="flex cursor-pointer items-end px-2 py-1">
                             <BsTrash3
                               onClick={() =>
                                 deleteImage(image.path, image.stkkod)
                               }
                               className={`${
                                 jsonImages && image ? "block" : "hidden"
-                              } w-4 h-4 text-red-700 cursor-pointer`}
+                              } w-4 h-4 text-red-700`}
                             />
                           </div>
                         </>

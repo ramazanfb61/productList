@@ -13,15 +13,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model CARKART {
+  CARKOD           String     @id
+  CARYETKILI       String?
+  CARUNVAN         String?
+  CARUNVAN3        String?
+  CAROZKOD1        String?
+  CAROZKOD2        String?
+  CAROZKOD3        String?
+  CAROZKOD4        String?
+  CAROZKOD5        String?
+}
+
 model STKKART {
-  STKKOD      String  @id
-  STKCINSI    String?
-  STKOZKOD1   String?
-  STKOZKOD3   String?
-  STKOZKOD5   String?
-  CARGRADE    String?
-  CARCATEGORY String?
-  STOK        Int?
-  FIYAT       Float?
-  RESIM       String?
+  STKKOD           String     @id  
+  STKCINSI         String?    
+  STKOZKOD1        String?
+  STKOZKOD3        String? 
+  STKOZKOD5        String? 
 }

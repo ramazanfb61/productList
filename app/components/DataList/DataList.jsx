@@ -255,11 +255,11 @@ export default function DataList() {
                           <>
                             <Image
                               src={image.path}
-                              width={45}
-                              height={45}
+                              width={50}
+                              height={50}
                               alt={image.stkkod}
                             />
-                            <div className="flex cursor-pointer items-end px-2 py-1">
+                            <div className="flex cursor-pointer items-center px-2 mr-5 py-1">
                               <BsTrash3
                                 onClick={() =>
                                   deleteImage(image.path, image.stkkod)

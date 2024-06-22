@@ -9,6 +9,13 @@ export const config = {
   },
 };
 
+let jsonFilePath;
+ if (process.env.NODE_ENV === "production") {
+   jsonFilePath = path.join(process.cwd(), "data.json");
+ } else {
+   jsonFilePath = path.join(process.cwd(), "public", "data.json");
+ }
+
 const handler = async (req, res) => {
   if (req.method === "DELETE") {
     try {
@@ -17,8 +24,7 @@ const handler = async (req, res) => {
       if (!stkkod) {
         return res.status(400).json({ error: "stkkod is required." });
       }
-      // json file path
-      const jsonFilePath = path.join(process.cwd(), "public", "data.json");
+      
 
       // read /public/data.json
       let jsonData;
@@ -86,7 +92,6 @@ const handler = async (req, res) => {
       await fs.writeFile(filePath, fileContent, "base64");
 
       // JSON dosya yolu
-      const jsonFilePath = path.join(process.cwd(), "public", "data.json");
       let jsonData = [];
 
       // JSON dosyasını oku

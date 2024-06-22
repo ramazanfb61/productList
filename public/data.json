@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "path": "/uploads/1050-kedi.jpeg",
+    "stkkod": "1050"
+  },
+  {
+    "path": "/uploads/1051-kedi.jpeg",
+    "stkkod": "1051"
+  },
+  {
+    "path": "/uploads/1052-indir.jpeg",
+    "stkkod": "1052"
+  },
+  {
+    "path": "/uploads/1053-kedi2.jpeg",
+    "stkkod": "1053"
+  }
+]

@@ -2,14 +2,14 @@ import fs from "fs/promises";
 import path from "path";
 
 // JSON dosyasının yolu
-// let jsonFilePath;
-// if (process.env.NODE_ENV === "production") {
-//   jsonFilePath = path.join(process.cwd(), "data.json");
-// } else {
-//   jsonFilePath = path.join(process.cwd(), "public", "data.json");
-// }
+ let jsonFilePath;
+ if (process.env.NODE_ENV === "production") {
+   jsonFilePath = path.join(process.cwd(), "data.json");
+ } else {
+   jsonFilePath = path.join(process.cwd(), "public", "data.json");
+ }
 
-let jsonFilePath = path.join(process.cwd(), "public", "data.json");
+//let jsonFilePath = path.join(process.cwd(), "public", "data.json");
 
 
 const handler = async (req, res) => {

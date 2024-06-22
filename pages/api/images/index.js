@@ -149,7 +149,7 @@ const handler = async (req, res) => {
       return res.status(201).json({ message: "Success" });
     } catch (error) {
       console.log("Error occurred ", error);
-      return res.status(500).json({ message: "Failed" });
+      return res.status(500).json({ message: "Failed",error:error });
     }
   } else {
     res.setHeader("Allow", ["DELETE", "POST"]);

@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { BsCheckCircleFill, BsFillXCircleFill } from "react-icons/bs";
 import { BiImageAdd } from "react-icons/bi";
 import { BsTrash3 } from "react-icons/bs";
@@ -21,8 +21,9 @@ export default function DataList() {
   const [isLoading, setIsLoading] = useState(false);
   const [filter, setFilter] = useState(false);
   const [jsonImages, setJsonImages] = useState([{ msg: "" }, { msg: "" }]);
-  // toplam sayfa
   const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE);
+
+  const fileInputRef = useRef(null);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -58,14 +59,14 @@ export default function DataList() {
   };
 
   // ürünleri sayfalara böl
-  let paginatedProducts ;
+  let paginatedProducts;
 
-  if(products && products.length > 0){
+  if (products && products.length > 0) {
     paginatedProducts = products.slice(
       (currentPage - 1) * ITEMS_PER_PAGE,
       currentPage * ITEMS_PER_PAGE
     );
-  }else{
+  } else {
     paginatedProducts = [];
   }
 
@@ -103,28 +104,60 @@ export default function DataList() {
   };
 
   // fotoğraf yükleme
-  async function handleFiles(e, key) {
-    const formData = new FormData();
-    formData.append("file", e.target.files[0]);
-    formData.append("key", key);
-    // 'post' olursa image yükle 'delete' olursa sil
+  const handleFileChange = (e, stkkod) => {
+    const file = e.target.files[0];
 
-    const data = await fetch(`/api/getImage`, {
-      method: "POST",
-      body: formData,
-    });
-    jsonData();
-  }
+    if (!file) {
+      console.log("Please select a file");
+      return;
+    }
 
-  async function deleteImage(path, stkkod) {
-    console.log("delete", stkkod, path);
-    const formData = new FormData();
-    formData.append("path", path);
-    formData.append("stkkod", stkkod);
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
 
-    const data = await fetch(`/api/getImage`, {
+    reader.onload = async () => {
+      const base64Content = reader.result.split(",")[1]; // Get the base64 string without the prefix
+
+      try {
+        const response = await fetch(`/api/images`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            fileContent: base64Content,
+            fileName: file.name,
+            key: stkkod,
+          }),
+        });
+
+        const data = await response.json();
+        fileInputRef.current.value = null;
+        jsonData();
+      } catch (error) {
+        console.error("Failed to upload file");
+      }
+    };
+
+    reader.onerror = () => {
+      setMessage("Failed to read file");
+    };
+  };
+
+  async function deleteImage(filePath, stkkod) {
+    // console.log("delete", stkkod, path);
+    // const formData = new FormData();
+    // formData.append("path", path);
+    // formData.append("stkkod", stkkod);
+
+    const payload = {
+      filePath,
+      stkkod,
+    };
+
+    const data = await fetch(`/api/images`, {
       method: "DELETE",
-      body: formData,
+      body: JSON.stringify(payload),
     });
     jsonData();
   }
@@ -200,109 +233,109 @@ export default function DataList() {
               </tr>
             </thead>
             <tbody className="text-left divide-y min-w-96 divide-gray-100">
-              {paginatedProducts && paginatedProducts.map((product) => {
-                const image =
-                  jsonImages && jsonImages.length > 0
-                    ? jsonImages.find((e) => e.stkkod === product.STKKOD)
-                    : { stkkod: "", path: "" };
+              {paginatedProducts &&
+                paginatedProducts.map((product) => {
+                  const image =
+                    jsonImages && jsonImages.length > 0
+                      ? jsonImages.find((e) => e.stkkod === product.STKKOD)
+                      : { stkkod: "", path: "" };
 
-                return (
-                  <tr key={product.STKKOD} className="even:bg-gray-50 ">
-                    <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                      <input
-                        type="checkbox"
-                        name=""
-                        id=""
-                        className="h-5 w-5"
-                      />
-                    </td>
-                    <td className="flex p-3 text-sm text-gray-700 whitespace-nowrap box-content">
-                      {jsonImages && image && image.path.length > 0 && (
-                        <>
-                          <Image
-                            src={image.path}
-                            width={45}
-                            height={45}
-                            alt={image.stkkod}
-                          />
-                          <div className="flex cursor-pointer items-end px-2 py-1">
-                            <BsTrash3
-                              onClick={() =>
-                                deleteImage(image.path, image.stkkod)
-                              }
-                              className={`${
-                                jsonImages && image ? "block" : "hidden"
-                              } w-4 h-4 text-red-700`}
+                  return (
+                    <tr key={product.STKKOD} className="even:bg-gray-50 ">
+                      <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                        <input
+                          type="checkbox"
+                          name=""
+                          id=""
+                          className="h-5 w-5"
+                        />
+                      </td>
+                      <td className="flex p-3 text-sm text-gray-700 whitespace-nowrap box-content">
+                        {jsonImages && image && image.path.length > 0 && (
+                          <>
+                            <Image
+                              src={image.path}
+                              width={45}
+                              height={45}
+                              alt={image.stkkod}
                             />
-                          </div>
-                        </>
-                      )}
-                    </td>
-                    <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                      {product.STKCINSI}
-                    </td>
-                    <td className="p-3 text-sm font-bold cursor-pointer text-blue-500 hover:underline whitespace-nowrap">
-                      {product.STKKOD}
-                    </td>
-                    <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                      {product.STOK}
-                    </td>
-                    <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                      {product.FIYAT}
-                    </td>
-                    <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                      {product.CARCATEGORY}
-                    </td>
-                    <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                      {product.CARGRADE}
-                    </td>
-                    <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                      <span
-                        className={`p-1.5 text-xs font-medium uppercase flex justify-evenly tracking-wider rounded-lg ${
-                          product.STKOZKOD1 === "A"
-                            ? "text-green-800 bg-green-200 pr-11"
-                            : "text-red-800 bg-red-200"
-                        }`}
-                      >
-                        {product.STKOZKOD1 === "A" ? (
-                          <BsCheckCircleFill className="inline mr-2 self-center" />
-                        ) : (
-                          <BsFillXCircleFill className="inline mr-2 self-center" />
+                            <div className="flex cursor-pointer items-end px-2 py-1">
+                              <BsTrash3
+                                onClick={() =>
+                                  deleteImage(image.path, image.stkkod)
+                                }
+                                className={`${
+                                  jsonImages && image ? "block" : "hidden"
+                                } w-4 h-4 text-red-700`}
+                              />
+                            </div>
+                          </>
                         )}
-                        {product.STKOZKOD1 === "A"
-                          ? "Satışa uygun"
-                          : "Satışa uygun değil"}
-                      </span>
-                    </td>
-                    <td className="whitespace-nowrap text-center">
-                      <div className="flex flex-col pt-1 justify-center items-center">
-                        <label
-                          className="transition-all cursor-pointer p-2 rounded-full hover:bg-gray-300"
-                          htmlFor={`file-${product.STKKOD}`}
+                      </td>
+                      <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                        {product.STKCINSI}
+                      </td>
+                      <td className="p-3 text-sm font-bold cursor-pointer text-blue-500 hover:underline whitespace-nowrap">
+                        {product.STKKOD}
+                      </td>
+                      <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                        {product.STOK}
+                      </td>
+                      <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                        {product.FIYAT}
+                      </td>
+                      <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                        {product.CARCATEGORY}
+                      </td>
+                      <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                        {product.CARGRADE}
+                      </td>
+                      <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                        <span
+                          className={`p-1.5 text-xs font-medium uppercase flex justify-evenly tracking-wider rounded-lg ${
+                            product.STKOZKOD1 === "A"
+                              ? "text-green-800 bg-green-200 pr-11"
+                              : "text-red-800 bg-red-200"
+                          }`}
                         >
-                          <BiImageAdd className="w-7 h-7" />
-                        </label>
-                        <form>
+                          {product.STKOZKOD1 === "A" ? (
+                            <BsCheckCircleFill className="inline mr-2 self-center" />
+                          ) : (
+                            <BsFillXCircleFill className="inline mr-2 self-center" />
+                          )}
+                          {product.STKOZKOD1 === "A"
+                            ? "Satışa uygun"
+                            : "Satışa uygun değil"}
+                        </span>
+                      </td>
+                      <td className="whitespace-nowrap text-center">
+                        <form className="flex flex-col pt-1 justify-center items-center">
+                          <label
+                            className="transition-all cursor-pointer p-2 rounded-full hover:bg-gray-300"
+                            htmlFor={`file-${product.STKKOD}`}
+                          >
+                            <BiImageAdd className="w-7 h-7" />
+                          </label>
                           <input
-                            multiple
+                            ref={fileInputRef}
+                            accept="image/*"
                             onChange={(event) =>
-                              handleFiles(event, product.STKKOD)
+                              handleFileChange(event, product.STKKOD)
                             }
                             type="file"
                             id={`file-${product.STKKOD}`}
                             className="hidden"
                             name="file"
                           />
+                          <label
+                            className=" w-24 text-xs  overflow-hidden text-ellipsis"
+                            htmlFor={`file-${product.STKKOD}`}
+                          ></label>
                         </form>
-                        <label
-                          className=" w-24 text-xs  overflow-hidden text-ellipsis"
-                          htmlFor={`file-${product.STKKOD}`}
-                        ></label>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+                      </td>
+                    </tr>
+                  );
+                })}
             </tbody>
           </table>
         </div>

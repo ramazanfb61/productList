@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { BsCheckCircleFill, BsFillXCircleFill } from "react-icons/bs";
 import { BiImageAdd } from "react-icons/bi";
 import { BsTrash3 } from "react-icons/bs";
-import { ToastContainer, toast, Bounce } from "react-toastify";
+import { toast, Bounce } from "react-toastify";
 // filter yapılmadı
 import FilterButton from "./FilterButton";
 
@@ -83,7 +83,6 @@ export default function DataList() {
         throw new Error("API hatası: " + response.status);
       }
       const data = await response.json();
-      console.log(data);
       if (data.length < 1) {
         setJsonImages([{ msg: "Bos data" }, { msg: "bos data" }]);
         return;
@@ -126,9 +125,7 @@ export default function DataList() {
   };
 
   const handleDisplayProductImage = (key, picture) => {
-    console.log("Hello", key, picture);
     
-    console.log(picture);
     openModal(picture)
   };
 
@@ -157,8 +154,11 @@ export default function DataList() {
         });
 
         const data = await response.json();
-
-        console.log("data", data.message);
+        if(data.message === 'Success'){
+          toast.success('Başarılı!')
+        }else{
+          toast.error('Başarısız!')
+        }
         fileInputRef.current.value = null;
         jsonData();
       } catch (error) {
@@ -186,6 +186,13 @@ export default function DataList() {
       method: "DELETE",
       body: JSON.stringify(payload),
     });
+    const res = await data.json()
+
+    if(res.message === 'Success'){
+      toast.success('Başarılı!')
+    }else{
+      toast.error('Başarısız!')
+    }
     jsonData();
   }
   // get json(images) and product data

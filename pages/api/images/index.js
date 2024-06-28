@@ -1,13 +1,6 @@
 import path from "path";
 import fs from "fs/promises";
 
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: "10mb", // Adjust the limit as per your requirement
-    },
-  },
-};
 
 let jsonFilePath;
  if (process.env.NODE_ENV === "production") {
@@ -38,8 +31,9 @@ const handler = async (req, res) => {
       }
 
       const data = JSON.parse(jsonData);
-
+      console.log(data);
       const itemIndex = data.findIndex((item) => item.stkkod === stkkod);
+      console.log(itemIndex);
       if (itemIndex === -1) {
         return res.status(404).json({ message: "Item not found" });
       }
@@ -117,7 +111,7 @@ const handler = async (req, res) => {
         }
       }
 
-      // Yeni veriyi JSON dosyasına ekle
+      // Yeni veriyi data.json'a ekle
       const newData = {
         path: `/uploads/${key + "-" + fileName}`,
         stkkod: key,
@@ -130,7 +124,7 @@ const handler = async (req, res) => {
       // JSON dosyasını güncelle
       await fs.writeFile(jsonFilePath, JSON.stringify(jsonData, null, 2));
 
-      // API'ye kaydet
+      // data.json'a kaydet
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/savejson`,
         {

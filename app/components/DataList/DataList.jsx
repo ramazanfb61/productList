@@ -3,12 +3,14 @@ import { useState, useEffect, useRef } from "react";
 import { BsCheckCircleFill, BsFillXCircleFill } from "react-icons/bs";
 import { BiImageAdd } from "react-icons/bi";
 import { BsTrash3 } from "react-icons/bs";
-
+import { ToastContainer, toast, Bounce } from "react-toastify";
 // filter yapılmadı
 import FilterButton from "./FilterButton";
 
 import Pagination from "./Pagination";
 import Image from "next/image";
+
+import Modal from "../Modal";
 
 // sayfadaki item sayısı
 const ITEMS_PER_PAGE = 10;
@@ -22,8 +24,11 @@ export default function DataList() {
   const [filter, setFilter] = useState(false);
   const [jsonImages, setJsonImages] = useState([{ msg: "" }, { msg: "" }]);
   const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE);
-
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [currentStkkod, setCurrentStkkod] = useState(null);
   const fileInputRef = useRef(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState('');
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -106,14 +111,34 @@ export default function DataList() {
   // fotoğraf yükleme
   const handleFileChange = (e, stkkod) => {
     const file = e.target.files[0];
+    setCurrentStkkod(stkkod);
+    setSelectedFile(file);
+  };
 
-    if (!file) {
-      console.log("Please select a file");
+  const openModal = (image) => {
+    setSelectedImage(image);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedImage("");
+  };
+
+  const handleDisplayProductImage = (key, picture) => {
+    console.log("Hello", key, picture);
+    
+    console.log(picture);
+    openModal(picture)
+  };
+
+  useEffect(() => {
+    if (!selectedFile) {
       return;
     }
 
     const reader = new FileReader();
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(selectedFile);
 
     reader.onload = async () => {
       const base64Content = reader.result.split(",")[1]; // Get the base64 string without the prefix
@@ -126,23 +151,25 @@ export default function DataList() {
           },
           body: JSON.stringify({
             fileContent: base64Content,
-            fileName: file.name,
-            key: stkkod,
+            fileName: selectedFile.name,
+            key: currentStkkod,
           }),
         });
 
         const data = await response.json();
+
+        console.log("data", data.message);
         fileInputRef.current.value = null;
         jsonData();
       } catch (error) {
-        console.error("Failed to upload file");
+        console.error("Failed to upload file", error);
       }
     };
 
     reader.onerror = () => {
       setMessage("Failed to read file");
     };
-  };
+  }, [selectedFile]);
 
   async function deleteImage(filePath, stkkod) {
     // console.log("delete", stkkod, path);
@@ -161,7 +188,7 @@ export default function DataList() {
     });
     jsonData();
   }
-
+  // get json(images) and product data
   useEffect(() => {
     // tüm ürünleri al
 
@@ -191,6 +218,7 @@ export default function DataList() {
           </div>
         </div>
         <div className="overflow-auto">
+          <dialog>aaa</dialog>
           <table className="md:mx-auto border w-full md:rounded-lg shadow">
             <thead className="bg-blue-900 text-white border-b-2 border-gray-200">
               <tr className="w-full border ">
@@ -258,6 +286,13 @@ export default function DataList() {
                               width={50}
                               height={50}
                               alt={image.stkkod}
+                              className="cursor-pointer"
+                              onClick={() =>
+                                handleDisplayProductImage(
+                                  product.STKKOD,
+                                  image.path
+                                )
+                              }
                             />
                             <div className="flex cursor-pointer items-center px-2 mr-5 py-1">
                               <BsTrash3
@@ -269,13 +304,20 @@ export default function DataList() {
                                 } w-4 h-4 text-red-700`}
                               />
                             </div>
+                            <Modal isOpen={isModalOpen} onClose={closeModal}>
+                              <img
+                                src={selectedImage}
+                                alt="Selected"
+                                className="max-w-full h-auto"
+                              />
+                            </Modal>
                           </>
                         )}
                       </td>
                       <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
                         {product.STKCINSI}
                       </td>
-                      <td className="p-3 text-sm font-bold cursor-pointer text-blue-500 hover:underline whitespace-nowrap">
+                      <td className="p-3 text-sm font-bold text-blue-500 hover:underline whitespace-nowrap">
                         {product.STKKOD}
                       </td>
                       <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
@@ -293,19 +335,22 @@ export default function DataList() {
                       <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
                         <span
                           className={`p-1.5 text-xs font-medium uppercase flex justify-evenly tracking-wider rounded-lg ${
-                            product.STKOZKOD1 === "A"
+                            product.STKOZKOD1 === "A" ||
+                            product.STKOZKOD3 === "B2"
                               ? "text-green-800 bg-green-200 pr-11"
-                              : "text-red-800 bg-red-200"
+                              : ""
                           }`}
                         >
-                          {product.STKOZKOD1 === "A" ? (
+                          {product.STKOZKOD1 === "A" ||
+                          product.STKOZKOD3 === "B2" ? (
                             <BsCheckCircleFill className="inline mr-2 self-center" />
                           ) : (
-                            <BsFillXCircleFill className="inline mr-2 self-center" />
+                            ""
                           )}
-                          {product.STKOZKOD1 === "A"
+                          {product.STKOZKOD1 === "A" ||
+                          product.STKOZKOD3 === "B2"
                             ? "Satışa uygun"
-                            : "Satışa uygun değil"}
+                            : ""}
                         </span>
                       </td>
                       <td className="whitespace-nowrap text-center">

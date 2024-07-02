@@ -327,8 +327,7 @@ export default function DataList() {
                               <img
                                 src={selectedImage}
                                 alt="Selected"
-                                className="max-w-full h-auto"
-                              />
+                                className="max-h-[80vh] w-auto"                              />
                             </Modal>
                             <DeleteModal
                               isOpen={isDeleteModalOpen}

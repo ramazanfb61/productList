@@ -9,12 +9,11 @@ export default function Home() {
       </div>
       <ToastContainer
         position="bottom-right"
-        autoClose={4000}
+        autoClose={3000}
         hideProgressBar={false}
         newestOnTop={true}
         closeOnClick
         rtl={false}
-        pauseOnFocusLoss
         draggable
         
       />

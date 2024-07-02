@@ -263,20 +263,10 @@ export default function DataList() {
                   Stok Kodu
                 </th>
                 <th className="p-3  text-sm font-semibold tracking-wide text-left">
-                  <span className=" w-24 flex items-center">
-                    <span className="mr-1">Stok Sayısı</span>
-                  </span>
+                  Grub
                 </th>
                 <th className="p-3  text-sm font-semibold tracking-wide text-left">
-                  <span className=" w-12 flex items-center">
-                    <span className="mr-1">Fiyat</span>
-                  </span>
-                </th>
-                <th className="p-3  text-sm font-semibold tracking-wide text-left ">
-                  Ders
-                </th>
-                <th className="p-3  text-sm font-semibold tracking-wide text-left">
-                  Sınıf
+                  Stok
                 </th>
                 <th className="p-3  text-sm font-semibold tracking-wide text-center">
                   Ürün Durumu
@@ -356,18 +346,14 @@ export default function DataList() {
                       <td className="p-3 text-sm font-bold text-blue-500 hover:underline whitespace-nowrap">
                         {product.STKKOD}
                       </td>
-                      <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                        {product.STOK}
+                      <td className="p-3 text-sm text-gray-700 whitespace-nowrap hover:underline">
+                        {product.STKOZKOD3}
                       </td>
-                      <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                        {product.FIYAT}
+                     
+                      <td className="p-3 text-sm text-gray-700 whitespace-nowrap hover:underline">
+                        {product.STKOZKOD5}
                       </td>
-                      <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                        {product.CARCATEGORY}
-                      </td>
-                      <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                        {product.CARGRADE}
-                      </td>
+                      
                       <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
                         <span
                           className={`p-1.5 text-xs font-medium uppercase flex justify-evenly tracking-wider rounded-lg ${

@@ -3,13 +3,14 @@ import { useState, useEffect, useRef } from "react";
 import { BsCheckCircleFill, BsFillXCircleFill } from "react-icons/bs";
 import { BiImageAdd } from "react-icons/bi";
 import { BsTrash3 } from "react-icons/bs";
-import { toast, Bounce } from "react-toastify";
+import { toast } from "react-toastify";
+
 // filter yapılmadı
 import FilterButton from "./FilterButton";
 
 import Pagination from "./Pagination";
 import Image from "next/image";
-
+import DeleteModal from "../DeleteModal";
 import Modal from "../Modal";
 
 // sayfadaki item sayısı
@@ -28,7 +29,10 @@ export default function DataList() {
   const [currentStkkod, setCurrentStkkod] = useState(null);
   const fileInputRef = useRef(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedImage, setSelectedImage] = useState('');
+  const [selectedImage, setSelectedImage] = useState("");
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(null);
+  const [imageToDelete, setImageToDelete] = useState({ path: "", stkkod: "" });
+
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -113,20 +117,19 @@ export default function DataList() {
     setCurrentStkkod(stkkod);
     setSelectedFile(file);
   };
-
+  // foto modal
   const openModal = (image) => {
     setSelectedImage(image);
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
-    setIsModalOpen(false);
     setSelectedImage("");
+    setIsModalOpen(false);
   };
 
   const handleDisplayProductImage = (key, picture) => {
-    
-    openModal(picture)
+    openModal(picture);
   };
 
   useEffect(() => {
@@ -154,10 +157,10 @@ export default function DataList() {
         });
 
         const data = await response.json();
-        if(data.message === 'Success'){
-          toast.success('Başarılı!')
-        }else{
-          toast.error('Başarısız!')
+        if (data.message === "Success") {
+          toast.success("Başarılı!");
+        } else {
+          toast.error("Başarısız!");
         }
         fileInputRef.current.value = null;
         jsonData();
@@ -186,15 +189,32 @@ export default function DataList() {
       method: "DELETE",
       body: JSON.stringify(payload),
     });
-    const res = await data.json()
+    const res = await data.json();
 
-    if(res.message === 'Success'){
-      toast.success('Başarılı!')
-    }else{
-      toast.error('Başarısız!')
+    if (res.message === "Success") {
+      toast.success("Başarılı!");
+    } else {
+      toast.error("Başarısız!");
     }
+    // close delete modal 
+    console.log(filePath,stkkod);
+    setIsDeleteModalOpen(false)
     jsonData();
   }
+  // delete modal
+
+  const handleDeleteProductImage = (imagePath, imageStkkod) => {
+    // show delete modal = true
+    // modalı aç
+    setImageToDelete({ path: imagePath, stkkod: imageStkkod });
+    
+    setIsDeleteModalOpen(true);
+
+    //deleteImage(imagePath,imageStkkod)
+  };
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+  };
   // get json(images) and product data
   useEffect(() => {
     // tüm ürünleri al
@@ -225,7 +245,6 @@ export default function DataList() {
           </div>
         </div>
         <div className="overflow-auto">
-          <dialog>aaa</dialog>
           <table className="md:mx-auto border w-full md:rounded-lg shadow">
             <thead className="bg-blue-900 text-white border-b-2 border-gray-200">
               <tr className="w-full border ">
@@ -304,7 +323,10 @@ export default function DataList() {
                             <div className="flex cursor-pointer items-center px-2 mr-5 py-1">
                               <BsTrash3
                                 onClick={() =>
-                                  deleteImage(image.path, image.stkkod)
+                                  handleDeleteProductImage(
+                                    image.path,
+                                    image.stkkod
+                                  )
                                 }
                                 className={`${
                                   jsonImages && image ? "block" : "hidden"
@@ -318,6 +340,13 @@ export default function DataList() {
                                 className="max-w-full h-auto"
                               />
                             </Modal>
+                            <DeleteModal
+                              isOpen={isDeleteModalOpen}
+                              onClose={closeDeleteModal}
+                              onConfirm={() =>
+                                deleteImage(imageToDelete.path, imageToDelete.stkkod)
+                              }
+                            />
                           </>
                         )}
                       </td>

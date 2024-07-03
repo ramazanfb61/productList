@@ -4,7 +4,9 @@ import { BsCheckCircleFill, BsFillXCircleFill } from "react-icons/bs";
 import { BiImageAdd } from "react-icons/bi";
 import { BsTrash3 } from "react-icons/bs";
 import { toast } from "react-toastify";
-
+import { FaImage } from "react-icons/fa6";
+import { PiCaretUpDownFill } from "react-icons/pi";
+import Link from "next/link";
 // filter yapılmadı
 import FilterButton from "./FilterButton";
 
@@ -32,7 +34,6 @@ export default function DataList() {
   const [selectedImage, setSelectedImage] = useState("");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(null);
   const [imageToDelete, setImageToDelete] = useState({ path: "", stkkod: "" });
-
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -105,7 +106,10 @@ export default function DataList() {
         throw new Error("API hatası: " + response.status);
       }
       const data = await response.json();
-      setProducts(data.data);
+      const filtered = data.data.filter(
+        (item) => item.STKOZKOD1 === "A" || item.STKOZKOD1 === "bayi"
+      );
+      setProducts(filtered);
     } catch (error) {
       console.error("Veri çekme hatası: ", error);
     }
@@ -196,9 +200,9 @@ export default function DataList() {
     } else {
       toast.error("Başarısız!");
     }
-    // close delete modal 
-    console.log(filePath,stkkod);
-    setIsDeleteModalOpen(false)
+    // close delete modal
+    console.log(filePath, stkkod);
+    setIsDeleteModalOpen(false);
     jsonData();
   }
   // delete modal
@@ -207,7 +211,7 @@ export default function DataList() {
     // show delete modal = true
     // modalı aç
     setImageToDelete({ path: imagePath, stkkod: imageStkkod });
-    
+
     setIsDeleteModalOpen(true);
 
     //deleteImage(imagePath,imageStkkod)
@@ -244,64 +248,82 @@ export default function DataList() {
             />
           </div>
         </div>
-        <div className="overflow-auto">
-          <table className="md:mx-auto border w-full md:rounded-lg shadow">
-            <thead className="bg-blue-900 text-white border-b-2 border-gray-200">
-              <tr className="w-full border ">
-                <th className="p-3 text-sm font-semibold tracking-wide text-left">
-                  <input type="checkbox" name="" id="" className="h-5 w-5" />
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-NavyBlue text-white">
+              <tr>
+                <th
+                  scope="col"
+                  className="px-10 py-3 text-left text-base font-medium "
+                >
+                  <FaImage />
                 </th>
-                <th className="p-3  text-sm font-semibold tracking-wide text-left">
-                  Resim
+                <th
+                  scope="col"
+                  className="px-6 flex items-center cursor-pointer  py-3 text-left text-base font-medium"
+                >
+                  İsim
+                  <PiCaretUpDownFill />
                 </th>
-                <th className="p-3 col-span-3  text-sm font-semibold tracking-wide text-left">
-                  <span className="flex items-center">
-                    <span className="mr-1">İsim</span>
-                  </span>
-                </th>
-                <th className="p-3  text-sm font-semibold tracking-wide text-left">
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-base font-medium  "
+                >
                   Stok Kodu
                 </th>
-                <th className="p-3  text-sm font-semibold tracking-wide text-left">
-                  Grub
+                <th
+                  scope="col"
+                  className="px-6 flex items-center cursor-pointer py-3 text-left text-base font-medium  "
+                >
+                  Fiyat
+                  <PiCaretUpDownFill />
                 </th>
-                <th className="p-3  text-sm font-semibold tracking-wide text-left">
-                  Stok
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-base font-medium "
+                >
+                  Kategori
                 </th>
-                <th className="p-3  text-sm font-semibold tracking-wide text-center">
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-base font-medium "
+                >
+                  Sınıf
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-base font-medium "
+                >
                   Ürün Durumu
                 </th>
-                <th className="p-3  text-sm font-semibold tracking-wide text-center">
+                <th className="px-6 py-3 text-left text-base font-medium">
                   Resim ekle
                 </th>
               </tr>
             </thead>
             <tbody className="text-left divide-y min-w-96 divide-gray-100">
               {paginatedProducts &&
-                paginatedProducts.map((product) => {
+                paginatedProducts.map((product, index) => {
                   const image =
                     jsonImages && jsonImages.length > 0
                       ? jsonImages.find((e) => e.stkkod === product.STKKOD)
                       : { stkkod: "", path: "" };
 
                   return (
-                    <tr key={product.STKKOD} className="even:bg-gray-50 ">
-                      <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                        <input
-                          type="checkbox"
-                          name=""
-                          id=""
-                          className="h-5 w-5"
-                        />
-                      </td>
+                    <tr
+                      key={product.STKKOD}
+                      className={`${
+                        index % 2 === 1 ? "bg-white" : "bg-gray-50"
+                      } `}
+                    >
                       <td className="flex p-3 text-sm text-gray-700 whitespace-nowrap box-content">
-                        {jsonImages && image && image.path.length > 0 && (
+                        {jsonImages && image && image.path.length > 0 ? (
                           <>
                             <Image
                               src={image.path}
                               width={50}
                               height={50}
-                              alt={image.stkkod}
+                              alt={image.path}
                               className="cursor-pointer"
                               onClick={() =>
                                 handleDisplayProductImage(
@@ -327,32 +349,44 @@ export default function DataList() {
                               <img
                                 src={selectedImage}
                                 alt="Selected"
-                                className="max-h-[80vh] w-auto"                              />
+                                className="max-h-[80vh] w-auto"
+                              />
                             </Modal>
                             <DeleteModal
                               isOpen={isDeleteModalOpen}
                               onClose={closeDeleteModal}
                               onConfirm={() =>
-                                deleteImage(imageToDelete.path, imageToDelete.stkkod)
+                                deleteImage(
+                                  imageToDelete.path,
+                                  imageToDelete.stkkod
+                                )
                               }
                             />
                           </>
-                        )}
+                        ) : ''}
                       </td>
-                      <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                        {product.STKCINSI}
+                      <td className="px-6 py-4 whitespace-nowrap  ">
+                        <Link
+                          href={`/`}
+                          className="cursor-pointer hover:text-[#0284c7]  "
+                        >
+                          {product.STKCINSI}
+                        </Link>
                       </td>
-                      <td className="p-3 text-sm font-bold text-blue-500 hover:underline whitespace-nowrap">
+                      <td className="px-6 py-4 whitespace-nowrap text-BaseDark ">
                         {product.STKKOD}
                       </td>
-                      <td className="p-3 text-sm text-gray-700 whitespace-nowrap hover:underline">
+
+                      <td className="px-6 py-4 whitespace-nowrap text-BaseDark">
+                        ₺{product.STKOZKOD5}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-BaseDark">
+                        {product.STKOZKOD2}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-BaseDark">
                         {product.STKOZKOD3}
                       </td>
-                     
-                      <td className="p-3 text-sm text-gray-700 whitespace-nowrap hover:underline">
-                        {product.STKOZKOD5}
-                      </td>
-                      
+
                       <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
                         <span
                           className={`p-1.5 text-xs font-medium uppercase flex justify-evenly tracking-wider rounded-lg ${

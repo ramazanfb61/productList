@@ -1,8 +1,7 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// Model Güncellendiğinde yapılacaklar:
+// 1-" npx prisma generate " bunu terminale yaz (enter!)
+// 2- VS Codu kapatıp yeniden aç.
+// ! Sırayla yaparsan gücelleme gerçekleşir.
 
 generator client {
   provider = "prisma-client-js"
@@ -14,21 +13,22 @@ datasource db {
 }
 
 model CARKART {
-  CARKOD           String     @id
-  CARYETKILI       String?
-  CARUNVAN         String?
-  CARUNVAN3        String?
-  CAROZKOD1        String?
-  CAROZKOD2        String?
-  CAROZKOD3        String?
-  CAROZKOD4        String?
-  CAROZKOD5        String?
+  CARKOD     String  @id
+  CARYETKILI String?
+  CARUNVAN   String?
+  CARUNVAN3  String?
+  CAROZKOD1  String?
+  CAROZKOD2  String?
+  CAROZKOD3  String?
+  CAROZKOD4  String?
+  CAROZKOD5  String?
 }
 
 model STKKART {
-  STKKOD           String     @id  
-  STKCINSI         String?    
-  STKOZKOD1        String?
-  STKOZKOD3        String? 
-  STKOZKOD5        String? 
+  STKKOD    String  @id
+  STKCINSI  String?
+  STKOZKOD1 String?
+  STKOZKOD3 String?
+  STKOZKOD5 String?
+  STKOZKOD2 String?
 }

@@ -120,6 +120,7 @@ export default function DataList() {
     const file = e.target.files[0];
     setCurrentStkkod(stkkod);
     setSelectedFile(file);
+    e.target.value = null;  // Dosya input'unu sıfırlayın
   };
   // foto modal
   const openModal = (image) => {
@@ -167,6 +168,8 @@ export default function DataList() {
           toast.error("Başarısız!");
         }
         fileInputRef.current.value = null;
+        setSelectedFile(null);  // Burada selectedFile state'ini sıfırlayın
+
         jsonData();
       } catch (error) {
         console.error("Failed to upload file", error);
